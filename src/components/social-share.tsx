@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
+
 import { AlertCircle } from "lucide-react";
 import { 
   Share2, 
@@ -12,8 +12,7 @@ import {
   Linkedin, 
   MessageCircle,
   Instagram,
-  ExternalLink,
-  Check 
+  ExternalLink 
 } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 import { apiRequest } from "../lib/queryClient";
@@ -79,7 +78,7 @@ const socialPlatforms: SocialPlatform[] = [
 ];
 
 export default function SocialShare({ orderNumber, amount, onClose }: SocialShareProps) {
-  const [sharedPlatforms, setSharedPlatforms] = useState<Set<string>>(new Set());
+  //const [sharedPlatforms, setSharedPlatforms] = useState<Set<string>>(new Set());
   const [isPopupBlocked, setIsPopupBlocked] = useState(false);
   const { toast } = useToast();
 
@@ -88,7 +87,7 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
       const isBlocked = checkPopupBlocker();
       setIsPopupBlocked(isBlocked);
       
-      if (isBlocked) {
+      if (isPopupBlocked) {
         toast({
           title: "Popup Blocker Detected",
           description: (
@@ -301,7 +300,7 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
               >
                 <Button
                   onClick={() => handleShare(platform.id)}
-                  disabled={shareMutation.isPending || sharedPlatforms.has(platform.id)}
+                  disabled={shareMutation.isPending}
                   variant="outline"
                   className={`w-full justify-start gap-3 h-auto p-4 ${platform.bgColor} border-border hover:shadow-md transition-all duration-200`}
                 >
@@ -314,14 +313,14 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
                       <div className="text-xs text-muted-foreground">{platform.description}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {sharedPlatforms.has(platform.id) ? (
+                      {/* {sharedPlatforms.has(platform.id) ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                           <Check className="w-3 h-3 mr-1" />
                           Shared
                         </Badge>
-                      ) : (
+                      ) : ( */}
                         <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      )}
+                      {/* )} */}
                     </div>
                   </div>
                 </Button>
@@ -330,7 +329,7 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
           </div>
 
           {/* Stats */}
-          {sharedPlatforms.size > 0 && (
+          {/* {sharedPlatforms.size > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -343,7 +342,7 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
                 You're spreading the word about nothing! 🎉
               </div>
             </motion.div>
-          )}
+          )} */}
 
           {/* Close Button */}
           {onClose && (

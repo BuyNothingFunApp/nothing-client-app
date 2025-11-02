@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Crown, Gem, Star, Sparkles, Eye, ShoppingBag } from "lucide-react";
+import { Crown, Gem, Star, Sparkles, Eye } from "lucide-react";
 import { PRODUCT_CATEGORIES } from "../lib/constants";
 import type { Product } from "../schema/entity";
 
@@ -17,10 +17,9 @@ const categoryIcons = {
 
 interface ProductListProps {
   products: Product[];
-  onPurchase: (product: Product) => void;
 }
 
-export default function ProductList({ products, onPurchase }: ProductListProps) {
+export default function ProductList({ products }: ProductListProps) {
   const [, navigate] = useLocation();
 
   const handleViewProduct = (productId: string) => {

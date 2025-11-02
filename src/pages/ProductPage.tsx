@@ -1,25 +1,25 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "../components/ui/skeleton";
-import PurchaseModal from "../components/purchase-modal";
-import { useState } from "react";
+//import PurchaseModal from "../components/purchase-modal";
+//import { useState } from "react";
 import type { Product } from "../schema/entity";
 import ProductList from "../components/products";
 
 
 
 export default function ProductPage() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  //const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  //const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ["/products"],
   });
 
-  const handlePurchase = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
+  // const handlePurchase = (product: Product) => {
+  //   setSelectedProduct(product);
+  //   setIsModalOpen(true);
+  // };
 
   if (isLoading) {
     return (
@@ -58,18 +58,18 @@ export default function ProductPage() {
 
         <ProductList
           products={products ?? []}
-          onPurchase={handlePurchase}
+          //onPurchase={handlePurchase}
         />
       </div>
 
-      <PurchaseModal
+      {/* <PurchaseModal
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedProduct(null);
         }}
-      />
+      /> */}
     </section>
   );
 }

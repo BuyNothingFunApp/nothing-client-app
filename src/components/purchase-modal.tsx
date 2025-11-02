@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,11 +8,9 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent } from "./ui/card";
-import { Check, Mail, Package, AlertCircle, Share2, ArrowLeft } from "lucide-react";
+import {  AlertCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
-import { apiRequest } from "../lib/queryClient";
 import type { Product } from "../schema/entity";
-import SocialShare from "./social-share";
 import PaymentMethods from "./payment-methods";
 
 const checkoutSchema = z.object({

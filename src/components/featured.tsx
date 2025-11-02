@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "./ui/skeleton";
-import PurchaseModal from "./purchase-modal";
-import { useState } from "react";
 import type { Product } from "../schema/entity";
 import ProductList from "./products";
 import { motion } from "framer-motion";
@@ -9,19 +7,11 @@ import { motion } from "framer-motion";
 
 
 export default function Featured() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ["/products?featured=true"],
 
   });
-
-  const handlePurchase = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
 
   if (isLoading) {
     return (
@@ -58,7 +48,6 @@ export default function Featured() {
         </motion.div>
         <ProductList
           products={products ?? []}
-          onPurchase={handlePurchase}
         />
 
         {/* <PurchaseModal
