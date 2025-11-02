@@ -27,14 +27,11 @@ export default function ProductDetails() {
       customerName: string;
       customerEmail: string;
       productId: string;
-      amount: number;
       paymentDetails: {
         razorpay_payment_id: string;
         razorpay_order_id: string;
-        razorpay_signature: string;
       };
     }) => {
-      console.log("Checkout Mutation Data:", data);
       const response = await apiRequest("POST", "/checkout/confirm", data);
       return response.json();
     },
@@ -57,13 +54,11 @@ export default function ProductDetails() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePaymentSuccess = (paymentData: any) => {
-    console.log("Payment Data Received in ProductDetails:", paymentData);
     checkoutMutation.mutate({
       customerName: paymentData.customerName,
       customerEmail: paymentData.customerEmail,
       productId: paymentData.productId,
-      paymentDetails: paymentData.paymentDetails,
-      amount: paymentData.amount,
+      paymentDetails: paymentData.paymentDetails
     });
   };
 

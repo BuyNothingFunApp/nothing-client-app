@@ -102,13 +102,13 @@ export default function ProductList({ products, onPurchase }: ProductListProps) 
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Button>
-                    <Button
+                    {/* <Button
                       onClick={() => onPurchase(product)}
                       className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <ShoppingBag className="w-4 h-4 mr-2" />
                       Buy Now
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardContent>
               </Card>

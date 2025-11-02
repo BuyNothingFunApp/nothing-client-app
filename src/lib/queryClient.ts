@@ -1,7 +1,7 @@
 import { QueryClient, type QueryFunction } from "@tanstack/react-query";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL; // Correctly typed
-
+//const API_BASE_URL = "http://10.176.124.56:3000/api/v1"; // Replace with your actual API base URL
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -40,8 +40,8 @@ export const getQueryFn: <T>(options: {
       const params = queryKey.slice(1).map((key) => `/${key}`).join("");
       endpoint += params;
     }
-    const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
-    
+    //const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     const res = await fetch(url, {
       credentials: "include",
     });

@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { AlertCircle } from "lucide-react";
 import { 
   Share2, 
   Twitter, 
@@ -80,175 +79,29 @@ const socialPlatforms: SocialPlatform[] = [
 
 export default function SocialShare({ orderNumber, amount, onClose }: SocialShareProps) {
   const [sharedPlatforms, setSharedPlatforms] = useState<Set<string>>(new Set());
-  const [isPopupBlocked, setIsPopupBlocked] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const checkInitialPopupState = () => {
-      const isBlocked = checkPopupBlocker();
-      setIsPopupBlocked(isBlocked);
-      
-      if (isBlocked) {
-        toast({
-          title: "Popup Blocker Detected",
-          description: (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-yellow-500" />
-                <p>Please enable popups for a better sharing experience.</p>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Look for the popup blocker icon in your browser's address bar.
-              </p>
-            </div>
-          ),
-          duration: 8000,
-        });
-      }
-    };
-
-    // Small delay to ensure browser is ready
-    setTimeout(checkInitialPopupState, 1000);
-  }, [toast]);
-  
-  const fallbackCopyToClipboard = (text: string) => {
-      console.log('Using fallback copy method'); // Debug log
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.cssText = 'position: fixed; left: -9999px; top: 0';
-      document.body.appendChild(textarea);
-      
-      try {
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        return true;
-      } catch (err) {
-        document.body.removeChild(textarea);
-        console.error('Fallback copy failed:', err); // Debug log
-        return false;
-      }
-    };
-
-  const copyToClipboard = async (text: string) => {
-    console.log('Attempting to copy URL:', text); // Debug log
-    
-    
-    try {
-      let copySuccessful = false;
-
-      // First try the Clipboard API
-      if (navigator?.clipboard?.writeText) {
-        try {
-          console.log('Trying Clipboard API'); // Debug log
-          await navigator.clipboard.writeText(text);
-          copySuccessful = true;
-        } catch (err) {
-          console.log('Clipboard API failed:', err); // Debug log
-        }
-      }
-
-      // If Clipboard API failed, try the fallback
-      if (!copySuccessful) {
-        copySuccessful = fallbackCopyToClipboard(text);
-      }
-
-      if (copySuccessful) {
-        toast({
-          title: "URL Copied!",
-          description: "Share URL has been copied to your clipboard",
-        });
-      } else {
-        throw new Error('Both copy methods failed');
-      }
-    } catch (err) {
-      console.error('Copy failed completely:', err); // Debug log
-      
-      // Show the URL in a toast with clear instructions
-      toast({
-        title: "Manual Copy Required",
-        description: (
-          <div className="space-y-2">
-            <p>Please copy this URL:</p>
-            <div 
-              className="p-2 bg-slate-100 dark:bg-slate-800 rounded-md overflow-x-auto"
-              onClick={(e) => {
-                const target = e.currentTarget;
-                target.querySelector('input')?.select();
-              }}
-            >
-              <input 
-                type="text"
-                readOnly
-                value={text}
-                className="w-full bg-transparent border-none text-xs p-1 focus:outline-none"
-                onClick={(e) => e.currentTarget.select()}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">Click the URL to select it, then press Ctrl/Cmd + C to copy</p>
-          </div>
-        ),
-        duration: 15000,
-      });
-    }
-  };
-
-  const checkPopupBlocker = (): boolean => {
-    const popup = window.open('about:blank', '_blank');
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      return true; // Popups are blocked
-    }
-    popup.close();
-    return false; // Popups are allowed
-  };
-
-
-
-  const handleShare = async (platform: string) => {
-    try {
-      console.log('Sharing to platform:', platform); // Debug log
-      
+  const shareMutation = useMutation({
+    mutationFn: async ({ platform }: { platform: string }) => {
       const response = await apiRequest("POST", "/share", {
         orderNumber,
         platform
       });
-      const data = await response.json();
-      console.log('Share API response:', data); // Debug log
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      setSharedPlatforms(prev => new Set(Array.from(prev).concat([variables.platform])));
       
-      if (!data.data) {
-        throw new Error("No share URL received");
+      // Open the share URL
+      if (data.shareUrl) {
+        window.open(data.shareUrl, '_blank', 'width=600,height=400');
       }
-
-      const shareUrl = data.data;
-      console.log('Share URL received:', shareUrl); // Debug log
       
-      const popup = window.open(shareUrl, "_blank");
-      console.log('Popup attempt result:', popup ? 'success' : 'blocked'); // Debug log
-
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        // Popup was blocked, copy URL instead
-        console.log('Popup blocked, attempting to copy URL'); // Debug log
-        await copyToClipboard(shareUrl);
-        setIsPopupBlocked(true);
-      } else {
-        //setSharedPlatforms(prev => new Set([...prev, platform]));
-        toast({
-          title: "Shared Successfully!",
-          description: `Your nothing purchase has been shared on ${platform}.`,
-        });
-      }
-    } catch (error) {
-      console.error('Share error:', error); // Debug log
       toast({
-        title: "Share Failed",
-        description: error instanceof Error ? error.message : "Failed to share",
-        variant: "destructive",
+        title: "Shared Successfully!",
+        description: `Your nothing purchase has been shared on ${variables.platform}.`,
       });
-    }
-  };
-
-  const shareMutation = useMutation({
-    mutationFn: (args: { platform: string }) => handleShare(args.platform),
+    },
     onError: (error) => {
       toast({
         title: "Share Failed",
@@ -257,7 +110,11 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
       });
     },
   });
-  
+
+  const handleShare = (platform: string) => {
+    shareMutation.mutate({ platform });
+  };
+
   const generatePreviewText = () => {
     return `I just bought ${amount} worth of absolutely nothing from buyNothing.com! 🎯 Order #${orderNumber} - achieving peak minimalism! 💫`;
   };

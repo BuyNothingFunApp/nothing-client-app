@@ -61,14 +61,14 @@ export default function Featured() {
           onPurchase={handlePurchase}
         />
 
-        <PurchaseModal
+        {/* <PurchaseModal
           product={selectedProduct}
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false);
             setSelectedProduct(null);
           }}
-        />
+        /> */}
       </div>
     </section>
 

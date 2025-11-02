@@ -1,11 +1,10 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Check, Mail, Package, Share2, ArrowLeft } from "lucide-react";
 import SocialShare from "./social-share";
 import { useState } from "react";
 import type { Product } from "../schema/entity";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface PurchaseConfirmationProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +23,7 @@ export default function OrderConfirmModal({
   onShare
 }: PurchaseConfirmationProps) {
   const [step, setStep] = useState<"confirmation" | "share">("confirmation");
-  console.log("Order Confirmation Data:", orderData);
+
   const goBack = () => {
     if (step === "share") {
       setStep("confirmation");
@@ -39,28 +38,23 @@ export default function OrderConfirmModal({
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"> 
-            <div className="flex items-center gap-2 mb-4">
-              {step !== "confirmation" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={goBack}
-                  className="p-1 h-6 w-6"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-              )}
-              <h2 className="text-lg font-semibold">
-                {step === "confirmation" ? "Purchase Confirmed!" : "Share Your Nothing"}
-              </h2>
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-      <AnimatePresence mode="wait">
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        {step !== "confirmation" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goBack}
+            className="p-1 h-6 w-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
+        <h2 className="text-lg font-semibold">
+          {step === "confirmation" ? "Purchase Confirmed!" : "Share Your Nothing"}
+        </h2>
+      </div>
+
       {step === "confirmation" && (
         <motion.div
           key="confirmation"
@@ -83,7 +77,7 @@ export default function OrderConfirmModal({
           <p className="text-muted-foreground mb-6">
             Congratulations! You have successfully purchased{" "}
             <span className="font-semibold text-foreground">{product.name}</span> for{" "}
-            <span className="font-semibold text-foreground">${orderData?.data.amount}</span>.
+            <span className="font-semibold text-foreground">${orderData?.amount}</span>.
           </p>
 
           <Card className="bg-muted/50 mb-6">
@@ -140,15 +134,13 @@ export default function OrderConfirmModal({
           transition={{ duration: 0.3 }}
         >
           <SocialShare
-            orderNumber={orderData?.data.orderNumber || ""}
+            orderNumber={orderData?.orderNumber || ""}
             productName={product.name}
-            amount={orderData?.data.amount || ""}
+            amount={orderData?.amount || ""}
             onClose={onClose}
           />
         </motion.div>
       )}
-      </AnimatePresence>
-    </DialogContent>
-    </Dialog>
+    </>
   );
 }

@@ -34,7 +34,7 @@ interface PurchaseModalProps {
 export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClose }: PurchaseModalProps) {
   const [step, setStep] = useState<"form" | "payment" | "confirmation" | "share">("form");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //const [orderData, setOrderData] = useState<any>(null);
+  const [orderData, setOrderData] = useState<any>(null);
   //const [customerData, setCustomerData]=useState<CheckoutFormData>();
 
   
@@ -50,48 +50,44 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
     },
   });
 
-  // const checkoutMutation = useMutation({
-  //   mutationFn: async (data: {
-  //     customerName: string;
-  //     customerEmail: string;
-  //     productId: string;
-  //     amount?: number;
-  //     paymentDetails: {
-  //       razorpay_payment_id: string;
-  //       razorpay_order_id: string;
-  //       razorpay_signature?: string;
-  //     };
-  //   }) => {
-  //     setOrderData(data);
-  //     console.log("Checkout Data Purchase Model:", data);
-  //     const response = await apiRequest("POST", "/checkout/confirm", data);
-  //     return response.json();
-  //   },
-  //   onSuccess: (data) => {
-  //     console.log(JSON.stringify(data));
-  //     console.log(data);
-  //     setOrderData(data);
-  //     if (!isOpen) {
-  //       onClose();
-  //     }
+  const checkoutMutation = useMutation({
+    mutationFn: async (data: {
+      customerName: string;
+      customerEmail: string;
+      productId: string;
+      paymentDetails: {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+      };
+    }) => {
+      setOrderData(data);
+      const response = await apiRequest("POST", "/checkout/confirm", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log(JSON.stringify(data));
+      console.log(data);
+      setOrderData(data);
+      if (!isOpen) {
+        onClose();
+      }
 
-  //     setStep("confirmation");
-  //     toast({
-  //       title: "Payment Successful!",
-  //       description: "Your payment has been processed successfully.",
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       title: "Payment Failed",
-  //       description: error.message,
-  //       variant: "destructive",
-  //     });
-  //   },
-  // });
+      setStep("confirmation");
+      toast({
+        title: "Payment Successful!",
+        description: "Your payment has been processed successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Payment Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   //const handleSubmit = (data: CheckoutFormData) => {
-
   const handleSubmit = () => {
     //setCustomerData(data);
     setStep("payment");
@@ -108,24 +104,24 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
   //   checkoutMutation.mutate(purchaseData);
   // };
 
-  // useEffect(() => {
-  //   const handleStorageChange = (e: StorageEvent) => {
-  //     if (e.key === 'lastOrder' && e.newValue) {
-  //       setOrderData(JSON.parse(e.newValue));
-  //       setStep("confirmation");
-  //       localStorage.removeItem('lastOrder');
-  //     }
-  //   };
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'lastOrder' && e.newValue) {
+        setOrderData(JSON.parse(e.newValue));
+        setStep("confirmation");
+        localStorage.removeItem('lastOrder');
+      }
+    };
 
-  //   window.addEventListener('storage', handleStorageChange);
-  //   return () => window.removeEventListener('storage', handleStorageChange);
-  // }, []);
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleClose = () => {
    
     console.log('closing model');
     setStep("form");
-    //setOrderData(null);
+    setOrderData(null);
     //setCustomerData(null);
     form.reset();
     onClose();
@@ -134,16 +130,16 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
   const goBack = () => {
     if (step === "payment") {
       setStep("form");
-    // } else if (step === "confirmation") {
-    //   setStep("payment");
-    // } else if (step === "share") {
-    //   setStep("confirmation");
+    } else if (step === "confirmation") {
+      setStep("payment");
+    } else if (step === "share") {
+      setStep("confirmation");
     }
   };
 
-  // const goToShare = () => {
-  //   setStep("share");
-  // };
+  const goToShare = () => {
+    setStep("share");
+  };
 
   if (!product) return null;
 
@@ -241,11 +237,10 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
 
                 <Button
                   type="submit"
-                  //disabled={checkoutMutation.isPending}
+                  disabled={checkoutMutation.isPending}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  {/* {checkoutMutation.isPending ? "Processing..." : `Continue to Payment`} */}
-                  {`Continue to Payment`}
+                  {checkoutMutation.isPending ? "Processing..." : `Continue to Payment`}
                 </Button>
               </form>
             </motion.div>
@@ -266,6 +261,14 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
                   email: form.getValues('customerEmail')
                 }}
                 productId={product._id}
+                // onPaymentSuccess={(paymentData) => {
+                //   checkoutMutation.mutate({
+                //     customerName: customerData?.customerName ?? "",
+                //     customerEmail: customerData?.customerEmail ?? "",
+                //     productId: product._id,
+                //     paymentDetails: paymentData
+                //   });
+                // }}
                 onPaymentSuccess={onPaymentSuccess}
                 onPaymentError={(error) => {
                   toast({
@@ -279,7 +282,7 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
             </motion.div>
           )}
 
-          {/* {step === "confirmation" && (
+          {step === "confirmation" && (
             <motion.div
               key="confirmation"
               initial={{ opacity: 0, x: 20 }}
@@ -358,13 +361,13 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
               transition={{ duration: 0.3 }}
             >
               <SocialShare
-                orderNumber={orderData?.paymentDetails?.razorpay_order_id || ""}
+                orderNumber={orderData?.orderNumber || ""}
                 productName={orderData?.product || ""}
-                amount={orderData?.amount || ""}
+                amount={orderData?.order?.amount || ""}
                 onClose={handleClose}
               />
             </motion.div>
-          )} */}
+          )}
         </AnimatePresence>
       </DialogContent>
     </Dialog>

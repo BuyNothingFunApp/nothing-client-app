@@ -14,15 +14,9 @@ interface PaymentMethodsProps {
     };
     productId: string;
     onPaymentSuccess: (paymentData: {
-        customerName: string;
-        customerEmail: string;
-        amount: number;
-        productId: string;
-        paymentDetails: {
-            razorpay_payment_id: string;
-            razorpay_order_id: string;
-            razorpay_signature: string;
-        };
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
     }) => void;
     onPaymentError: (error: string) => void;
 }
@@ -45,8 +39,6 @@ export default function PaymentMethods({
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
             script.async = true;
             document.body.appendChild(script);
-            const razKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-            console.log("Razorpay Key ID:", razKey);
 
             script.onload = async () => {
                 try {
@@ -67,7 +59,7 @@ export default function PaymentMethods({
 
                     // 3. Initialize Razorpay checkout
                     const options = {
-                        key: razKey,
+                        key: 'rzp_test_nufFlXyfJvh7ql',
                         amount: order.data.amount * 100,
                         currency: 'INR',
                         name: "Buy Nothing",
@@ -89,7 +81,6 @@ export default function PaymentMethods({
                                 onPaymentError("Incomplete payment response from Razorpay");
                                 return;
                             }
-                            
 
                             // Send data to backend to validate
                             const verificationResponse = await apiRequest("POST", "/checkout/validate", {
@@ -97,16 +88,10 @@ export default function PaymentMethods({
                                 razorpay_signature,
                                 razorpay_payment_id
                             });
-                            const paymentDataResponse   = {
-                                customerName: customerData.name,
-                                customerEmail: customerData.email,
-                                amount: amount,
-                                productId: productId,
-                                paymentDetails: response,
-                            };
+
                             const verification = await verificationResponse.json();
                             if (verification.success) {
-                                onPaymentSuccess(paymentDataResponse);
+                                onPaymentSuccess(response);
                             } else {
                                 onPaymentError("Payment verification failed");
                             }
