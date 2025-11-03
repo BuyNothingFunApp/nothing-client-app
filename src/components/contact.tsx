@@ -14,12 +14,6 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
-// interface ContactModalProps {
-//     customerName: string,
-//     customerEmail: string,
-//     message: string
-// }
-// ContactComponent.tsx
 export function Contact() {
 
     const form = useForm<ContactFormData>({
