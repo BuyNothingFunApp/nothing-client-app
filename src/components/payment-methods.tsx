@@ -46,7 +46,6 @@ export default function PaymentMethods({
             script.async = true;
             document.body.appendChild(script);
             const razKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-            console.log("Razorpay Key ID:", razKey);
 
             script.onload = async () => {
                 try {
@@ -63,7 +62,6 @@ export default function PaymentMethods({
                     }
 
                     const order = await orderResponse.json();
-                    console.log(JSON.stringify(order.data));
 
                     // 3. Initialize Razorpay checkout
                     const options = {
@@ -76,8 +74,6 @@ export default function PaymentMethods({
                         order_id: order.data.id,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         handler: async function (response: any) {
-                            console.log('Handler received full response:', response);
-
                             const {
                                 razorpay_payment_id,
                                 razorpay_order_id,
@@ -85,12 +81,10 @@ export default function PaymentMethods({
                             } = response;
 
                             if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-                                console.error("Missing fields in Razorpay response", response);
                                 onPaymentError("Incomplete payment response from Razorpay");
                                 return;
                             }
                             
-
                             // Send data to backend to validate
                             const verificationResponse = await apiRequest("POST", "/checkout/validate", {
                                 razorpay_order_id,
@@ -131,7 +125,6 @@ export default function PaymentMethods({
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const rzp = new (window as any).Razorpay(options);
-                    console.log("Options going to Razorpay:", options);
                     rzp.open();
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

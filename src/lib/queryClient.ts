@@ -15,7 +15,6 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log(`API Request: ${method} ${url}`, data);
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},

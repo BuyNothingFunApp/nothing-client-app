@@ -111,7 +111,6 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
   }, [toast]);
   
   const fallbackCopyToClipboard = (text: string) => {
-      console.log('Using fallback copy method'); // Debug log
       const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.cssText = 'position: fixed; left: -9999px; top: 0';
@@ -124,26 +123,21 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
         return true;
       } catch (err) {
         document.body.removeChild(textarea);
-        console.error('Fallback copy failed:', err); // Debug log
         return false;
       }
     };
 
-  const copyToClipboard = async (text: string) => {
-    console.log('Attempting to copy URL:', text); // Debug log
-    
-    
+  const copyToClipboard = async (text: string) => { 
     try {
       let copySuccessful = false;
 
       // First try the Clipboard API
       if (navigator?.clipboard?.writeText) {
         try {
-          console.log('Trying Clipboard API'); // Debug log
           await navigator.clipboard.writeText(text);
           copySuccessful = true;
         } catch (err) {
-          console.log('Clipboard API failed:', err); // Debug log
+          //console.error('Clipboard API copy failed:', err); // Debug log
         }
       }
 
@@ -161,8 +155,6 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
         throw new Error('Both copy methods failed');
       }
     } catch (err) {
-      console.error('Copy failed completely:', err); // Debug log
-      
       // Show the URL in a toast with clear instructions
       toast({
         title: "Manual Copy Required",
@@ -205,28 +197,23 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
 
   const handleShare = async (platform: string) => {
     try {
-      console.log('Sharing to platform:', platform); // Debug log
       
       const response = await apiRequest("POST", "/share", {
         orderNumber,
         platform
       });
       const data = await response.json();
-      console.log('Share API response:', data); // Debug log
       
       if (!data.data) {
         throw new Error("No share URL received");
       }
 
       const shareUrl = data.data;
-      console.log('Share URL received:', shareUrl); // Debug log
       
       const popup = window.open(shareUrl, "_blank");
-      console.log('Popup attempt result:', popup ? 'success' : 'blocked'); // Debug log
-
+     
       if (!popup || popup.closed || typeof popup.closed === 'undefined') {
         // Popup was blocked, copy URL instead
-        console.log('Popup blocked, attempting to copy URL'); // Debug log
         await copyToClipboard(shareUrl);
         setIsPopupBlocked(true);
       } else {
@@ -237,7 +224,6 @@ export default function SocialShare({ orderNumber, amount, onClose }: SocialShar
         });
       }
     } catch (error) {
-      console.error('Share error:', error); // Debug log
       toast({
         title: "Share Failed",
         description: error instanceof Error ? error.message : "Failed to share",

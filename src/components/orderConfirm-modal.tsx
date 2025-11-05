@@ -24,7 +24,6 @@ export default function OrderConfirmModal({
   onShare
 }: PurchaseConfirmationProps) {
   const [step, setStep] = useState<"confirmation" | "share">("confirmation");
-  console.log("Order Confirmation Data:", orderData);
   const goBack = () => {
     if (step === "share") {
       setStep("confirmation");

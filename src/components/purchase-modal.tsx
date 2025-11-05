@@ -30,14 +30,7 @@ interface PurchaseModalProps {
 
 export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClose }: PurchaseModalProps) {
   const [step, setStep] = useState<"form" | "payment" | "confirmation" | "share">("form");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //const [orderData, setOrderData] = useState<any>(null);
-  //const [customerData, setCustomerData]=useState<CheckoutFormData>();
-
-  
-  //const [customerData, setCustomerData] = useState<any>(null);
   const { toast } = useToast();
-
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -47,83 +40,12 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
     },
   });
 
-  // const checkoutMutation = useMutation({
-  //   mutationFn: async (data: {
-  //     customerName: string;
-  //     customerEmail: string;
-  //     productId: string;
-  //     amount?: number;
-  //     paymentDetails: {
-  //       razorpay_payment_id: string;
-  //       razorpay_order_id: string;
-  //       razorpay_signature?: string;
-  //     };
-  //   }) => {
-  //     setOrderData(data);
-  //     console.log("Checkout Data Purchase Model:", data);
-  //     const response = await apiRequest("POST", "/checkout/confirm", data);
-  //     return response.json();
-  //   },
-  //   onSuccess: (data) => {
-  //     console.log(JSON.stringify(data));
-  //     console.log(data);
-  //     setOrderData(data);
-  //     if (!isOpen) {
-  //       onClose();
-  //     }
-
-  //     setStep("confirmation");
-  //     toast({
-  //       title: "Payment Successful!",
-  //       description: "Your payment has been processed successfully.",
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       title: "Payment Failed",
-  //       description: error.message,
-  //       variant: "destructive",
-  //     });
-  //   },
-  // });
-
-  //const handleSubmit = (data: CheckoutFormData) => {
-
   const handleSubmit = () => {
-    //setCustomerData(data);
     setStep("payment");
   };
 
-
-  // const handlePayment = (paymentMethod: string, paymentDetails: any) => {
-  //   const purchaseData = {
-  //     ...customerData,
-  //     productId: product?._id,
-  //     paymentMethod,
-  //     paymentDetails,
-  //   };
-  //   checkoutMutation.mutate(purchaseData);
-  // };
-
-  // useEffect(() => {
-  //   const handleStorageChange = (e: StorageEvent) => {
-  //     if (e.key === 'lastOrder' && e.newValue) {
-  //       setOrderData(JSON.parse(e.newValue));
-  //       setStep("confirmation");
-  //       localStorage.removeItem('lastOrder');
-  //     }
-  //   };
-
-  //   window.addEventListener('storage', handleStorageChange);
-  //   return () => window.removeEventListener('storage', handleStorageChange);
-  // }, []);
-
   const handleClose = () => {
-   
-    console.log('closing model');
     setStep("form");
-    //setOrderData(null);
-    //setCustomerData(null);
     form.reset();
     onClose();
   };
@@ -131,16 +53,8 @@ export default function PurchaseModal({ product, isOpen, onPaymentSuccess, onClo
   const goBack = () => {
     if (step === "payment") {
       setStep("form");
-    // } else if (step === "confirmation") {
-    //   setStep("payment");
-    // } else if (step === "share") {
-    //   setStep("confirmation");
     }
   };
-
-  // const goToShare = () => {
-  //   setStep("share");
-  // };
 
   if (!product) return null;
 

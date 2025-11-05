@@ -53,7 +53,6 @@ export function Contact() {
                     title: "Message Failed",
                     variant: "destructive",
                 });
-            //console.error("Submission error:", error);
         }
     }
 
